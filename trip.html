@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>트립(Trip) - 여행 기록 앱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .header button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-card .unit {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Travel List */
+        .travel-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .travel-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .travel-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .travel-card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .travel-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .travel-card-image.no-image::before {
+            content: '📸';
+        }
+
+        .travel-card-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .travel-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .travel-card-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .travel-card-purpose {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            width: fit-content;
+        }
+
+        .travel-card-cost {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Travel Detail */
+        .travel-detail {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .travel-detail.active {
+            display: block;
+        }
+
+        .travel-detail-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .travel-detail-header button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .travel-detail-body {
+            padding: 30px;
+        }
+
+        .detail-section {
+            margin-bottom: 40px;
+        }
+
+        .detail-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .detail-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .info-item label {
+            display: block;
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .info-item value {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Photo Gallery */
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .photo-item {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            background: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .photo-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-item.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 32px;
+        }
+
+        /* Expenses Table */
+        .expenses-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .expenses-table th {
+            background: #f9f9f9;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .expenses-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .expenses-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .expense-amount {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .expense-category {
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        /* Add Expense Form */
+        .add-expense-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .add-expense-form input,
+        .add-expense-form select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .add-expense-form button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Chart */
+        .chart-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chart-label {
+            width: 100px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .chart-bar-container {
+            flex: 1;
+            height: 24px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 15px;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .chart-value {
+            width: 80px;
+            text-align: right;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #f9f9f9;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            background: #f0f0ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.active {
+            background: #e8eaf6;
+            border-color: #667eea;
+        }
+
+        .upload-area p {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .upload-area small {
+            color: #999;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .travel-list {
+                grid-template-columns: 1fr;
+            }
+
+            .add-expense-form {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state small {
+            display: block;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>✈️ 트립(Trip)</h1>
+            <button onclick="openTravelModal()">+ 새 여행 추가</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard')">대시보드</button>
+            <button class="tab" onclick="switchTab('travels')">여행 목록</button>
+            <button class="tab" onclick="switchTab('stats')">통계</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <div class="dashboard">
+                <div class="stat-card">
+                    <h3>총 여행 수</h3>
+                    <div class="value" id="totalTrips">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>총 경비</h3>
+                    <div class="value" id="totalExpense">₩0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>평균 경비</h3>
+                    <div class="value" id="avgExpense">₩0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>사진 수</h3>
+                    <div class="value" id="totalPhotos">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Travels Tab -->
+        <div id="travels" class="tab-content" style="display: none;">
+            <div id="travelList" class="travel-list"></div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="stats" class="tab-content" style="display: none;">
+            <div style="background: white; padding: 30px; border-radius: 12px;">
+                <h2>목적별 경비</h2>
+                <div class="chart-container" id="purposeChart"></div>
+                
+                <h2 style="margin-top: 40px;">카테고리별 경비</h2>
+                <div class="chart-container" id="categoryChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Travel Modal -->
+    <div id="travelModal" class="modal">
+        <div class="modal-content">
+            <h2>새 여행 기록</h2>
+            <form id="travelForm" onsubmit="saveTravelForm(event)">
+                <div class="form-group">
+                    <label>여행 이름</label>
+                    <input type="text" id="travelName" required placeholder="예: 제주도 가족여행">
+                </div>
+                <div class="form-group">
+                    <label>여행 목적</label>
+                    <select id="travelPurpose" required>
+                        <option value="">선택하세요</option>
+                        <option value="힐링">힐링</option>
+                        <option value="가족">가족</option>
+                        <option value="문화">문화유산</option>
+                        <option value="액티비티">액티비티</option>
+                        <option value="쇼핑">쇼핑</option>
+                        <option value="음식">음식</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>출발일</label>
+                    <input type="date" id="travelStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label>종료일</label>
+                    <input type="date" id="travelEndDate" required>
+                </div>
+                <div class="form-group">
+                    <label>장소</label>
+                    <input type="text" id="travelLocation" placeholder="예: 제주도, 서울">
+                </div>
+                <div class="form-group">
+                    <label>설명</label>
+                    <textarea id="travelDescription" rows="3" placeholder="여행에 대한 간단한 설명"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeTravelModal()">취소</button>
+                    <button type="submit" class="btn-save">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Travel Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="travel-detail-header">
+                <div>
+                    <h2 id="detailTitle"></h2>
+                </div>
+                <button onclick="closeDetailModal()">닫기</button>
+            </div>
+            <div class="travel-detail-body">
+                <div class="detail-section">
+                    <h3>여행 정보</h3>
+                    <div class="detail-info">
+                        <div class="info-item">
+                            <label>기간</label>
+                            <value id="detailDates"></value>
+                        </div>
+                        <div class="info-item">
+                            <label>목적</label>
+                            <value id="detailPurpose"></value>
+                        </div>
+                        <div class="info-item">
+                            <label>장소</label>
+                            <value id="detailLocation"></value>
+                        </div>
+                        <div class="info-item">
+                            <label>총 경비</label>
+                            <value id="detailTotalCost"></value>
+                        </div>
+                    </div>
+                    <div id="detailDescription" style="color: #666; line-height: 1.6;"></div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>사진</h3>
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('photoInput').click()">
+                        <p>📸 사진을 클릭하거나 드래그하여 업로드</p>
+                        <small>여러 장을 한번에 업로드할 수 있습니다</small>
+                    </div>
+                    <input type="file" id="photoInput" multiple accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                    <div class="photo-gallery" id="photoGallery"></div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>경비 기록</h3>
+                    <div class="add-expense-form">
+                        <input type="text" id="expenseName" placeholder="항목명">
+                        <select id="expenseCategory">
+                            <option value="숙박">숙박</option>
+                            <option value="식사">식사</option>
+                            <option value="교통">교통</option>
+                            <option value="입장료">입장료</option>
+                            <option value="쇼핑">쇼핑</option>
+                            <option value="기타">기타</option>
+                        </select>
+                        <input type="number" id="expenseAmount" placeholder="금액" step="1000">
+                        <button type="button" onclick="addExpense()">추가</button>
+                    </div>
+                    <table class="expenses-table" id="expensesTable">
+                        <thead>
+                            <tr>
+                                <th>항목</th>
+                                <th>카테고리</th>
+                                <th>금액</th>
+                                <th>삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesBody"></tbody>
+                    </table>
+
+                    <div style="margin-top: 30px;">
+                        <h4 style="margin-bottom: 15px;">카테고리별 분석</h4>
+                        <div class="chart-container" id="expenseChart"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; display: flex; gap: 10px;">
+                    <button class="btn-save" style="flex: 1;" onclick="saveTravelDetail()">저장</button>
+                    <button class="btn-cancel" style="flex: 1;" onclick="deleteTravelDetail()">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Management
+        const storage = {
+            travels: JSON.parse(localStorage.getItem('trip-travels') || '[]'),
+            
+            addTravel(travel) {
+                travel.id = Date.now().toString();
+                travel.photos = [];
+                travel.expenses = [];
+                this.travels.push(travel);
+                this.save();
+                return travel.id;
+            },
+
+            updateTravel(id, data) {
+                const idx = this.travels.findIndex(t => t.id === id);
+                if (idx > -1) {
+                    this.travels[idx] = { ...this.travels[idx], ...data };
+                    this.save();
+                }
+            },
+
+            deleteTravel(id) {
+                this.travels = this.travels.filter(t => t.id !== id);
+                this.save();
+            },
+
+            getTravel(id) {
+                return this.travels.find(t => t.id === id);
+            },
+
+            addPhoto(travelId, photoData) {
+                const travel = this.getTravel(travelId);
+                if (travel) {
+                    travel.photos.push({ id: Date.now().toString(), data: photoData });
+                    this.save();
+                }
+            },
+
+            deletePhoto(travelId, photoId) {
+                const travel = this.getTravel(travelId);
+                if (travel) {
+                    travel.photos = travel.photos.filter(p => p.id !== photoId);
+                    this.save();
+                }
+            },
+
+            addExpense(travelId, expense) {
+                const travel = this.getTravel(travelId);
+                if (travel) {
+                    travel.expenses.push({ id: Date.now().toString(), ...expense });
+                    this.save();
+                }
+            },
+
+            deleteExpense(travelId, expenseId) {
+                const travel = this.getTravel(travelId);
+                if (travel) {
+                    travel.expenses = travel.expenses.filter(e => e.id !== expenseId);
+                    this.save();
+                }
+            },
+
+            save() {
+                localStorage.setItem('trip-travels', JSON.stringify(this.travels));
+            }
+        };
+
+        let currentTravelId = null;
+
+        // UI Functions
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).style.display = 'block';
+            event.target.classList.add('active');
+            
+            if (tab === 'dashboard') updateDashboard();
+            if (tab === 'travels') renderTravelList();
+            if (tab === 'stats') renderStats();
+        }
+
+        function openTravelModal() {
+            document.getElementById('travelForm').reset();
+            document.getElementById('travelModal').classList.add('active');
+        }
+
+        function closeTravelModal() {
+            document.getElementById('travelModal').classList.remove('active');
+        }
+
+        function saveTravelForm(e) {
+            e.preventDefault();
+            const id = storage.addTravel({
+                name: document.getElementById('travelName').value,
+                purpose: document.getElementById('travelPurpose').value,
+                startDate: document.getElementById('travelStartDate').value,
+                endDate: document.getElementById('travelEndDate').value,
+                location: document.getElementById('travelLocation').value,
+                description: document.getElementById('travelDescription').value
+            });
+            closeTravelModal();
+            updateDashboard();
+            renderTravelList();
+        }
+
+        function renderTravelList() {
+            const list = document.getElementById('travelList');
+            if (storage.travels.length === 0) {
+                list.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><p>여행 기록이 없습니다</p><small>+ 새 여행 추가 버튼을 클릭하세요</small></div>';
+                return;
+            }
+
+            list.innerHTML = storage.travels.map(travel => {
+                const totalCost = travel.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+                return `
+                    <div class="travel-card" onclick="openDetailModal('${travel.id}')">
+                        <div class="travel-card-image ${travel.photos.length === 0 ? 'no-image' : ''}">
+                            ${travel.photos.length > 0 ? `<img src="${travel.photos[0].data}" alt="${travel.name}">` : ''}
+                        </div>
+                        <div class="travel-card-content">
+                            <h3>${travel.name}</h3>
+                            <div class="travel-card-meta">
+                                <span>${travel.startDate} ~ ${travel.endDate}</span>
+                                <span>${travel.location}</span>
+                            </div>
+                            <div class="travel-card-purpose">${travel.purpose}</div>
+                            <div class="travel-card-cost">₩${totalCost.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openDetailModal(id) {
+            currentTravelId = id;
+            const travel = storage.getTravel(id);
+            
+            document.getElementById('detailTitle').textContent = travel.name;
+            const daysDiff = Math.ceil((new Date(travel.endDate) - new Date(travel.startDate)) / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById('detailDates').textContent = `${travel.startDate} ~ ${travel.endDate} (${daysDiff}박)`;
+            document.getElementById('detailPurpose').textContent = travel.purpose;
+            document.getElementById('detailLocation').textContent = travel.location;
+            document.getElementById('detailDescription').textContent = travel.description || '(설명 없음)';
+            
+            const totalCost = travel.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+            document.getElementById('detailTotalCost').textContent = `₩${totalCost.toLocaleString()}`;
+
+            renderPhotos(travel);
+            renderExpenses(travel);
+            
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+            currentTravelId = null;
+        }
+
+        function renderPhotos(travel) {
+            const gallery = document.getElementById('photoGallery');
+            if (travel.photos.length === 0) {
+                gallery.innerHTML = '';
+                return;
+            }
+            gallery.innerHTML = travel.photos.map(photo => `
+                <div class="photo-item">
+                    <img src="${photo.data}" alt="photo" onclick="event.stopPropagation()">
+                </div>
+            `).join('');
+        }
+
+        function handlePhotoUpload(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    storage.addPhoto(currentTravelId, event.target.result);
+                    renderPhotos(storage.getTravel(currentTravelId));
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderExpenses(travel) {
+            const tbody = document.getElementById('expensesBody');
+            tbody.innerHTML = travel.expenses.map(expense => `
+                <tr>
+                    <td>${expense.name}</td>
+                    <td><span class="expense-category">${expense.category}</span></td>
+                    <td class="expense-amount">₩${(expense.amount || 0).toLocaleString()}</td>
+                    <td><button onclick="deleteExpenseItem('${expense.id}')" style="background: #ff6b6b; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">삭제</button></td>
+                </tr>
+            `).join('');
+
+            renderExpenseChart(travel);
+        }
+
+        function addExpense() {
+            const travel = storage.getTravel(currentTravelId);
+            const name = document.getElementById('expenseName').value.trim();
+            const category = document.getElementById('expenseCategory').value;
+            const amount = parseInt(document.getElementById('expenseAmount').value) || 0;
+
+            if (!name || amount === 0) return alert('항목명과 금액을 입력하세요');
+
+            storage.addExpense(currentTravelId, { name, category, amount });
+            renderExpenses(storage.getTravel(currentTravelId));
+            document.getElementById('expenseName').value = '';
+            document.getElementById('expenseAmount').value = '';
+            updateDashboard();
+        }
+
+        function deleteExpenseItem(expenseId) {
+            if (!confirm('삭제하시겠습니까?')) return;
+            storage.deleteExpense(currentTravelId, expenseId);
+            renderExpenses(storage.getTravel(currentTravelId));
+            updateDashboard();
+        }
+
+        function renderExpenseChart(travel) {
+            const chart = document.getElementById('expenseChart');
+            const categories = {};
+            
+            travel.expenses.forEach(e => {
+                categories[e.category] = (categories[e.category] || 0) + (e.amount || 0);
+            });
+
+            const total = Object.values(categories).reduce((a, b) => a + b, 0);
+            chart.innerHTML = Object.entries(categories).map(([cat, amount]) => {
+                const pct = total > 0 ? (amount / total * 100) : 0;
+                return `
+                    <div class="chart-bar">
+                        <div class="chart-label">${cat}</div>
+                        <div class="chart-bar-container">
+                            <div class="chart-bar-fill" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="chart-value">₩${amount.toLocaleString()} (${pct.toFixed(0)}%)</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function saveTravelDetail() {
+            updateDashboard();
+            closeDetailModal();
+        }
+
+        function deleteTravelDetail() {
+            if (!confirm('이 여행을 삭제하시겠습니까?')) return;
+            storage.deleteTravel(currentTravelId);
+            closeDetailModal();
+            updateDashboard();
+            renderTravelList();
+        }
+
+        function updateDashboard() {
+            const totalTrips = storage.travels.length;
+            const totalExpense = storage.travels.reduce((sum, t) => sum + t.expenses.reduce((s, e) => s + (e.amount || 0), 0), 0);
+            const avgExpense = totalTrips > 0 ? Math.round(totalExpense / totalTrips) : 0;
+            const totalPhotos = storage.travels.reduce((sum, t) => sum + t.photos.length, 0);
+
+            document.getElementById('totalTrips').textContent = totalTrips;
+            document.getElementById('totalExpense').textContent = '₩' + totalExpense.toLocaleString();
+            document.getElementById('avgExpense').textContent = '₩' + avgExpense.toLocaleString();
+            document.getElementById('totalPhotos').textContent = totalPhotos;
+        }
+
+        function renderStats() {
+            // Purpose Chart
+            const purposes = {};
+            storage.travels.forEach(t => {
+                purposes[t.purpose] = (purposes[t.purpose] || 0) + t.expenses.reduce((s, e) => s + (e.amount || 0), 0);
+            });
+
+            const purposeTotal = Object.values(purposes).reduce((a, b) => a + b, 0);
+            document.getElementById('purposeChart').innerHTML = Object.entries(purposes).map(([purpose, amount]) => {
+                const pct = purposeTotal > 0 ? (amount / purposeTotal * 100) : 0;
+                return `
+                    <div class="chart-bar">
+                        <div class="chart-label">${purpose}</div>
+                        <div class="chart-bar-container">
+                            <div class="chart-bar-fill" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="chart-value">₩${amount.toLocaleString()} (${pct.toFixed(0)}%)</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Category Chart
+            const categories = {};
+            storage.travels.forEach(t => {
+                t.expenses.forEach(e => {
+                    categories[e.category] = (categories[e.category] || 0) + (e.amount || 0);
+                });
+            });
+
+            const catTotal = Object.values(categories).reduce((a, b) => a + b, 0);
+            document.getElementById('categoryChart').innerHTML = Object.entries(categories).map(([cat, amount]) => {
+                const pct = catTotal > 0 ? (amount / catTotal * 100) : 0;
+                return `
+                    <div class="chart-bar">
+                        <div class="chart-label">${cat}</div>
+                        <div class="chart-bar-container">
+                            <div class="chart-bar-fill" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="chart-value">₩${amount.toLocaleString()} (${pct.toFixed(0)}%)</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize
+        updateDashboard();
+        renderTravelList();
+
+        // Set today's date as default
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('travelStartDate').valueAsDate = new Date();
+        document.getElementById('travelEndDate').valueAsDate = new Date();
+    </script>
+</body>
+</html>
