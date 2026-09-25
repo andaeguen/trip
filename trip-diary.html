@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>트립다이어리 - 여행을 기록하다</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #e8d4c0 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #5c4033;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #8d6e63;
+            font-weight: 300;
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-tabs button {
+            padding: 12px 24px;
+            border: none;
+            background: white;
+            color: #8d6e63;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tabs button.active {
+            background: linear-gradient(135deg, #d7ccc8 0%, #bcaaa4 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-tabs button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Content Area */
+        .content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            min-height: 400px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #5c4033;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f5deb3;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #d7ccc8;
+            background: #fafaf8;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Button Styling */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #d7ccc8 0%, #bcaaa4 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(215, 204, 200, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5deb3;
+            color: #5c4033;
+        }
+
+        .btn-secondary:hover {
+            background: #f0d799;
+        }
+
+        .btn-success {
+            background: #a1887f;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        /* Card Styling */
+        .card {
+            background: #fafaf8;
+            border-left: 4px solid #d7ccc8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            color: #5c4033;
+            margin-bottom: 8px;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #8d6e63;
+            margin-top: 12px;
+        }
+
+        /* Travel List */
+        .travel-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .travel-card {
+            background: linear-gradient(135deg, #fafaf8 0%, #f5f3f1 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #f5deb3;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .travel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-color: #d7ccc8;
+        }
+
+        .travel-card h3 {
+            color: #5c4033;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .travel-card-info {
+            font-size: 13px;
+            color: #8d6e63;
+            line-height: 1.8;
+        }
+
+        /* AI Result */
+        .ai-result {
+            background: linear-gradient(135deg, #fff8f3 0%, #fffaf5 100%);
+            border-left: 4px solid #d7ccc8;
+            padding: 24px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .ai-result h3 {
+            color: #5c4033;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-budget-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .budget-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #f5deb3;
+        }
+
+        .budget-item-label {
+            font-size: 12px;
+            color: #8d6e63;
+            margin-bottom: 8px;
+        }
+
+        .budget-item-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #d7ccc8;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: #f5deb3;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d7ccc8 0%, #bcaaa4 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Settlement */
+        .settlement-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .settlement-table th,
+        .settlement-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f5deb3;
+            font-size: 14px;
+        }
+
+        .settlement-table th {
+            background: #fafaf8;
+            color: #5c4033;
+            font-weight: 600;
+        }
+
+        .settlement-row {
+            background: white;
+            border-left: 3px solid #d7ccc8;
+        }
+
+        /* Daily Record */
+        .daily-record {
+            background: #fafaf8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #d7ccc8;
+        }
+
+        .daily-record h4 {
+            color: #5c4033;
+            margin-bottom: 12px;
+        }
+
+        /* Content Generator */
+        .content-preview {
+            background: linear-gradient(135deg, #fff8f3 0%, #fffaf5 100%);
+            padding: 24px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #d7ccc8;
+        }
+
+        .content-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 3px solid #d7ccc8;
+        }
+
+        .content-item p {
+            color: #5c4033;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .copy-btn {
+            font-size: 12px;
+            padding: 6px 12px;
+            background: #f5deb3;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #5c4033;
+            font-weight: 600;
+        }
+
+        .copy-btn:hover {
+            background: #f0d799;
+        }
+
+        /* Warning Alert */
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #0d47a1;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #1b5e20;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8d6e63;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h2 {
+            color: #5c4033;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📔 트립다이어리</h1>
+            <p>여행을 기록하고, 경비를 관리하고, 기억을 나누다</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('travels')">📍 여행 기록</button>
+            <button class="tab-btn" onclick="switchTab('predict')">💰 경비 예측</button>
+            <button class="tab-btn" onclick="switchTab('expense')">💳 경비 추적</button>
+            <button class="tab-btn" onclick="switchTab('settlement')">🧮 정산</button>
+            <button class="tab-btn" onclick="switchTab('content')">✨ SNS 콘텐츠</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- 1. Travels Tab -->
+            <div id="travels" class="tab-content active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="color: #5c4033;">진행 중인 여행</h2>
+                    <button class="btn btn-primary" onclick="openTravelModal()">+ 새 여행 시작</button>
+                </div>
+                <div id="travelList" class="travel-list"></div>
+            </div>
+
+            <!-- 2. Predict Tab -->
+            <div id="predict" class="tab-content">
+                <h2 style="color: #5c4033; margin-bottom: 24px;">💡 AI 경비 예측</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>여행지</label>
+                        <input type="text" id="predictDest" placeholder="예: 서울, 제주도, 도쿄">
+                    </div>
+                    <div class="form-group">
+                        <label>여행 기간</label>
+                        <input type="number" id="predictDays" placeholder="일수" min="1" value="5">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>인원 수</label>
+                        <input type="number" id="predictPeople" placeholder="명" min="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>숙박 등급</label>
+                        <select id="predictLevel">
+                            <option value="budget">저가 (게스트하우스)</option>
+                            <option value="mid" selected>중간 (3성)</option>
+                            <option value="premium">프리미엄 (5성)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; padding: 16px;" onclick="predictBudget()">🤖 Claude AI로 경비 예측하기</button>
+                <div id="predictResult"></div>
+            </div>
+
+            <!-- 3. Expense Tab -->
+            <div id="expense" class="tab-content">
+                <h2 style="color: #5c4033; margin-bottom: 24px;">💳 실시간 경비 추적</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>여행 선택</label>
+                        <select id="expenseTravel">
+                            <option value="">여행을 선택하세요</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="expenseTracker"></div>
+            </div>
+
+            <!-- 4. Settlement Tab -->
+            <div id="settlement" class="tab-content">
+                <h2 style="color: #5c4033; margin-bottom: 24px;">🧮 여행비 정산</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>여행 선택</label>
+                        <select id="settlementTravel">
+                            <option value="">여행을 선택하세요</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; padding: 16px;" onclick="calculateSettlement()">🤖 Claude AI로 정산하기</button>
+                <div id="settlementResult"></div>
+            </div>
+
+            <!-- 5. Content Tab -->
+            <div id="content" class="tab-content">
+                <h2 style="color: #5c4033; margin-bottom: 24px;">✨ SNS 콘텐츠 생성</h2>
+                <div class="form-group">
+                    <label>여행 선택</label>
+                    <select id="contentTravel">
+                        <option value="">여행을 선택하세요</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>여행 하이라이트 메모</label>
+                    <textarea id="contentMemo" placeholder="이 여행에서 가장 기억에 남는 순간, 특별했던 경험을 작성하세요..." rows="4"></textarea>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; padding: 16px;" onclick="generateContent()">✨ Claude AI로 SNS 글귀 생성</button>
+                <div id="contentResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Travel Modal -->
+    <div id="travelModal" class="modal">
+        <div class="modal-content">
+            <h2>새 여행 시작하기</h2>
+            <div class="form-group">
+                <label>여행 제목</label>
+                <input type="text" id="modalTravelName" placeholder="예: 제주도 가족여행">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>출발일</label>
+                    <input type="date" id="modalStartDate">
+                </div>
+                <div class="form-group">
+                    <label>종료일</label>
+                    <input type="date" id="modalEndDate">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>여행지</label>
+                    <input type="text" id="modalDest" placeholder="예: 제주도">
+                </div>
+                <div class="form-group">
+                    <label>동행인 수</label>
+                    <input type="number" id="modalPeople" value="1" min="1">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeTravelModal()">취소</button>
+                <button class="btn btn-primary" onclick="saveTravelModal()">시작</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 간단한 경고 - API 키 설정 필요
+        const showApiWarning = () => {
+            if (!localStorage.getItem('trip-claude-key')) {
+                const key = prompt('⚠️ Claude API 키를 입력하세요.\n(https://console.anthropic.com/account/keys에서 발급)\n\n프리 플랜이 아니면 작동합니다:');
+                if (key) {
+                    localStorage.setItem('trip-claude-key', key);
+                    alert('✓ API 키가 저장되었습니다!');
+                } else {
+                    alert('API 키 없이는 AI 기능을 사용할 수 없습니다.');
+                }
+            }
+        };
+
+        // Data Management
+        const storage = {
+            travels: JSON.parse(localStorage.getItem('trip-travels') || '[]'),
+            expenses: JSON.parse(localStorage.getItem('trip-expenses') || '[]'),
+            
+            addTravel(travel) {
+                travel.id = Date.now().toString();
+                travel.members = [];
+                this.travels.push(travel);
+                this.save();
+                return travel.id;
+            },
+
+            getTravel(id) {
+                return this.travels.find(t => t.id === id);
+            },
+
+            addExpense(travelId, expense) {
+                expense.id = Date.now().toString();
+                expense.travelId = travelId;
+                this.expenses.push(expense);
+                this.save();
+            },
+
+            getTravelExpenses(travelId) {
+                return this.expenses.filter(e => e.travelId === travelId);
+            },
+
+            save() {
+                localStorage.setItem('trip-travels', JSON.stringify(this.travels));
+                localStorage.setItem('trip-expenses', JSON.stringify(this.expenses));
+            }
+        };
+
+        // UI Functions
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'travels') renderTravelList();
+            if (tabName === 'expense') updateExpenseSelects();
+            if (tabName === 'settlement') updateSettlementSelects();
+            if (tabName === 'content') updateContentSelects();
+        }
+
+        function openTravelModal() {
+            document.getElementById('travelModal').classList.add('active');
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('modalStartDate').valueAsDate = new Date();
+            document.getElementById('modalEndDate').valueAsDate = new Date();
+        }
+
+        function closeTravelModal() {
+            document.getElementById('travelModal').classList.remove('active');
+        }
+
+        function saveTravelModal() {
+            const travel = {
+                name: document.getElementById('modalTravelName').value,
+                startDate: document.getElementById('modalStartDate').value,
+                endDate: document.getElementById('modalEndDate').value,
+                destination: document.getElementById('modalDest').value,
+                people: parseInt(document.getElementById('modalPeople').value)
+            };
+
+            if (!travel.name || !travel.destination) {
+                alert('여행 제목과 여행지를 입력하세요');
+                return;
+            }
+
+            storage.addTravel(travel);
+            closeTravelModal();
+            renderTravelList();
+            alert('✓ 여행이 생성되었습니다!');
+        }
+
+        function renderTravelList() {
+            const list = document.getElementById('travelList');
+            if (storage.travels.length === 0) {
+                list.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><div class="empty-state-icon">🧳</div><p>여행을 기록해보세요!</p></div>';
+                return;
+            }
+
+            list.innerHTML = storage.travels.map(travel => {
+                const expenses = storage.getTravelExpenses(travel.id);
+                const totalCost = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+                const days = Math.ceil((new Date(travel.endDate) - new Date(travel.startDate)) / (1000 * 60 * 60 * 24)) + 1;
+                return `
+                    <div class="travel-card">
+                        <h3>${travel.name}</h3>
+                        <div class="travel-card-info">
+                            <div>📅 ${travel.startDate} ~ ${travel.endDate}</div>
+                            <div>📍 ${travel.destination}</div>
+                            <div>👥 ${travel.people}명 ${days}박</div>
+                            <div style="margin-top: 12px; font-weight: 600; color: #d7ccc8;">💰 ₩${totalCost.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 1. AI 경비 예측
+        async function predictBudget() {
+            showApiWarning();
+            const apiKey = localStorage.getItem('trip-claude-key');
+            if (!apiKey) return alert('API 키를 설정해주세요');
+
+            const dest = document.getElementById('predictDest').value;
+            const days = document.getElementById('predictDays').value;
+            const people = document.getElementById('predictPeople').value;
+            const level = document.getElementById('predictLevel').value;
+
+            if (!dest) return alert('여행지를 입력하세요');
+
+            const resultDiv = document.getElementById('predictResult');
+            resultDiv.innerHTML = '<div style="text-align: center; padding: 40px;"><p>🤖 Claude AI가 분석 중...</p></div>';
+
+            const prompt = `당신은 여행 예산 전문가입니다. 
+다음 여행에 대한 예상 경비를 분석해주세요:
+- 여행지: ${dest}
+- 기간: ${days}일
+- 인원: ${people}명
+- 숙박등급: ${level === 'budget' ? '게스트하우스' : level === 'mid' ? '3성호텔' : '5성호텔'}
+
+다음 형식으로 JSON 응답해주세요:
+{
+  "totalBudget": 총예상경비,
+  "breakdown": {
+    "accommodation": "숙박비",
+    "meal": "식사비",
+    "transport": "교통비",
+    "activity": "활동비",
+    "shopping": "쇼핑비",
+    "other": "기타"
+  },
+  "tips": ["팁1", "팁2", "팁3"]
+}`;
+
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01',
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-3-5-sonnet-20241022',
+                        max_tokens: 1024,
+                        messages: [{
+                            role: 'user',
+                            content: prompt
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+
+                const content = data.content[0].text;
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                const result = JSON.parse(jsonMatch[0]);
+
+                resultDiv.innerHTML = `
+                    <div class="ai-result">
+                        <h3>📊 AI 경비 예측 결과</h3>
+                        <div class="alert alert-info">
+                            <strong>총 예상 경비: ₩${parseInt(result.totalBudget).toLocaleString()} / ${people}명</strong>
+                            <br>1인당: ₩${Math.round(parseInt(result.totalBudget) / people).toLocaleString()}
+                        </div>
+                        
+                        <h4 style="margin-top: 20px; color: #5c4033;">경비 분해</h4>
+                        <div class="ai-budget-breakdown">
+                            <div class="budget-item">
+                                <div class="budget-item-label">🏨 숙박</div>
+                                <div class="budget-item-value">${result.breakdown.accommodation}</div>
+                            </div>
+                            <div class="budget-item">
+                                <div class="budget-item-label">🍽️ 식사</div>
+                                <div class="budget-item-value">${result.breakdown.meal}</div>
+                            </div>
+                            <div class="budget-item">
+                                <div class="budget-item-label">🚕 교통</div>
+                                <div class="budget-item-value">${result.breakdown.transport}</div>
+                            </div>
+                            <div class="budget-item">
+                                <div class="budget-item-label">🎢 활동</div>
+                                <div class="budget-item-value">${result.breakdown.activity}</div>
+                            </div>
+                            <div class="budget-item">
+                                <div class="budget-item-label">🛍️ 쇼핑</div>
+                                <div class="budget-item-value">${result.breakdown.shopping}</div>
+                            </div>
+                            <div class="budget-item">
+                                <div class="budget-item-label">📌 기타</div>
+                                <div class="budget-item-value">${result.breakdown.other}</div>
+                            </div>
+                        </div>
+
+                        <h4 style="margin-top: 20px; color: #5c4033;">💡 팁</h4>
+                        ${result.tips.map(tip => `<div style="padding: 8px; background: white; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #d7ccc8; padding-left: 12px;">• ${tip}</div>`).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-warning">⚠️ 오류: ${error.message}<br><small>API 키를 확인하거나 다시 시도해주세요</small></div>`;
+            }
+        }
+
+        // 2. 경비 추적
+        function updateExpenseSelects() {
+            const select = document.getElementById('expenseTravel');
+            select.innerHTML = '<option value="">여행을 선택하세요</option>';
+            storage.travels.forEach(t => {
+                select.innerHTML += `<option value="${t.id}">${t.name} (${t.destination})</option>`;
+            });
+            select.addEventListener('change', (e) => {
+                if (e.target.value) renderExpenseTracker(e.target.value);
+                else document.getElementById('expenseTracker').innerHTML = '';
+            });
+        }
+
+        function renderExpenseTracker(travelId) {
+            const travel = storage.getTravel(travelId);
+            const expenses = storage.getTravelExpenses(travelId);
+            const totalExpense = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+
+            // AI 예측이 있다면 비교
+            const html = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>항목명</label>
+                        <input type="text" id="expenseName" placeholder="예: 호텔, 라면, 택시">
+                    </div>
+                    <div class="form-group">
+                        <label>카테고리</label>
+                        <select id="expenseCategory">
+                            <option value="숙박">🏨 숙박</option>
+                            <option value="식사">🍽️ 식사</option>
+                            <option value="교통">🚕 교통</option>
+                            <option value="활동">🎢 활동</option>
+                            <option value="쇼핑">🛍️ 쇼핑</option>
+                            <option value="기타">📌 기타</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>금액 (원)</label>
+                        <input type="number" id="expenseAmount" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>누가 냈나요?</label>
+                        <input type="text" id="expensePayer" placeholder="예: 나, 친구A">
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; padding: 16px;" onclick="addExpense('${travelId}')">💳 경비 추가</button>
+
+                <div style="margin-top: 30px;">
+                    <h3 style="color: #5c4033; margin-bottom: 16px;">📊 현재까지 지출</h3>
+                    <div class="alert alert-success" style="font-size: 16px;">
+                        <strong>총 지출: ₩${totalExpense.toLocaleString()}</strong>
+                    </div>
+
+                    ${expenses.length > 0 ? `
+                        <table class="settlement-table">
+                            <thead>
+                                <tr>
+                                    <th>항목</th>
+                                    <th>카테고리</th>
+                                    <th>금액</th>
+                                    <th>결제자</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${expenses.map(e => `
+                                    <tr class="settlement-row">
+                                        <td>${e.name}</td>
+                                        <td>${e.category}</td>
+                                        <td style="font-weight: 600;">₩${e.amount.toLocaleString()}</td>
+                                        <td>${e.payer}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    ` : ''}
+                </div>
+            `;
+
+            document.getElementById('expenseTracker').innerHTML = html;
+        }
+
+        function addExpense(travelId) {
+            const name = document.getElementById('expenseName').value;
+            const category = document.getElementById('expenseCategory').value;
+            const amount = parseInt(document.getElementById('expenseAmount').value) || 0;
+            const payer = document.getElementById('expensePayer').value;
+
+            if (!name || amount === 0 || !payer) return alert('모든 항목을 입력하세요');
+
+            storage.addExpense(travelId, { name, category, amount, payer });
+            renderExpenseTracker(travelId);
+            alert('✓ 경비가 기록되었습니다!');
+        }
+
+        // 3. 정산
+        function updateSettlementSelects() {
+            const select = document.getElementById('settlementTravel');
+            select.innerHTML = '<option value="">여행을 선택하세요</option>';
+            storage.travels.forEach(t => {
+                select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+            });
+        }
+
+        async function calculateSettlement() {
+            const travelId = document.getElementById('settlementTravel').value;
+            if (!travelId) return alert('여행을 선택하세요');
+
+            showApiWarning();
+            const apiKey = localStorage.getItem('trip-claude-key');
+            if (!apiKey) return;
+
+            const travel = storage.getTravel(travelId);
+            const expenses = storage.getTravelExpenses(travelId);
+
+            const resultDiv = document.getElementById('settlementResult');
+            resultDiv.innerHTML = '<div style="text-align: center; padding: 40px;"><p>🤖 Claude AI가 정산 계산 중...</p></div>';
+
+            const expenseData = expenses.map(e => `${e.payer}가 ${e.name}에서 ₩${e.amount} 지불`).join('\n');
+
+            const prompt = `당신은 여행 정산 전문가입니다.
+다음 여행에서 ${travel.people}명이 함께 지출했습니다:
+
+${expenseData}
+
+공평하게 정산하는 방법을 JSON 형식으로 알려주세요. 예를 들어 A가 B에게 30000원을 보낸다면:
+{
+  "settlements": [
+    {"from": "A", "to": "B", "amount": 30000, "memo": "정산금"}
+  ],
+  "tips": ["팁1", "팁2"]
+}
+
+정산 결과는 최소 거래 수가 되도록 최적화해주세요.`;
+
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01',
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-3-5-sonnet-20241022',
+                        max_tokens: 1024,
+                        messages: [{
+                            role: 'user',
+                            content: prompt
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+
+                const content = data.content[0].text;
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                const result = JSON.parse(jsonMatch[0]);
+
+                resultDiv.innerHTML = `
+                    <div class="ai-result">
+                        <h3>🧮 정산 결과</h3>
+                        <div class="alert alert-info">
+                            여행: <strong>${travel.name}</strong> / ${travel.people}명
+                        </div>
+
+                        <h4 style="margin-top: 20px; color: #5c4033;">💸 정산 내역</h4>
+                        <table class="settlement-table">
+                            <tbody>
+                                ${result.settlements.map((s, i) => `
+                                    <tr class="settlement-row">
+                                        <td><strong>${s.from}</strong></td>
+                                        <td style="text-align: center;">→</td>
+                                        <td><strong>${s.to}</strong></td>
+                                        <td style="text-align: right; font-weight: 600; color: #d7ccc8;">₩${s.amount.toLocaleString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+
+                        <h4 style="margin-top: 20px; color: #5c4033;">💡 팁</h4>
+                        ${result.tips.map(tip => `<div style="padding: 8px; background: white; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #d7ccc8; padding-left: 12px;">• ${tip}</div>`).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-warning">⚠️ 오류: ${error.message}</div>`;
+            }
+        }
+
+        // 4. SNS Content
+        function updateContentSelects() {
+            const select = document.getElementById('contentTravel');
+            select.innerHTML = '<option value="">여행을 선택하세요</option>';
+            storage.travels.forEach(t => {
+                select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+            });
+        }
+
+        async function generateContent() {
+            const travelId = document.getElementById('contentTravel').value;
+            const memo = document.getElementById('contentMemo').value;
+
+            if (!travelId) return alert('여행을 선택하세요');
+            if (!memo) return alert('여행 하이라이트 메모를 작성하세요');
+
+            showApiWarning();
+            const apiKey = localStorage.getItem('trip-claude-key');
+            if (!apiKey) return;
+
+            const travel = storage.getTravel(travelId);
+            const expenses = storage.getTravelExpenses(travelId);
+            const totalCost = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+
+            const resultDiv = document.getElementById('contentResult');
+            resultDiv.innerHTML = '<div style="text-align: center; padding: 40px;"><p>✨ Claude AI가 콘텐츠 생성 중...</p></div>';
+
+            const prompt = `당신은 감성적인 여행 콘텐츠 크리에이터입니다.
+다음 여행에 대해 인스타그램 캐러셀(Carousel)/릴스용 감성 글귀 5개를 작성해주세요:
+
+여행: ${travel.name}
+장소: ${travel.destination}
+기간: ${travel.startDate} ~ ${travel.endDate}
+동행: ${travel.people}명
+지출: ₩${totalCost.toLocaleString()}
+특별한 경험: ${memo}
+
+다음 JSON 형식으로 응답해주세요:
+{
+  "captions": [
+    {"title": "제목1", "content": "글귀1", "emoji": "이모지"},
+    {"title": "제목2", "content": "글귀2", "emoji": "이모지"}
+  ],
+  "hashtags": ["해시태그1", "해시태그2", ...]
+}`;
+
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01',
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-3-5-sonnet-20241022',
+                        max_tokens: 1500,
+                        messages: [{
+                            role: 'user',
+                            content: prompt
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+
+                const content = data.content[0].text;
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                const result = JSON.parse(jsonMatch[0]);
+
+                resultDiv.innerHTML = `
+                    <div class="content-preview">
+                        <h3 style="color: #5c4033; margin-bottom: 20px;">✨ SNS 콘텐츠</h3>
+                        
+                        ${result.captions.map((cap, i) => `
+                            <div class="content-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <h4 style="color: #5c4033; margin: 0;">${cap.emoji} ${cap.title}</h4>
+                                    <button class="copy-btn" onclick="copyToClipboard('${cap.content.replace(/'/g, "\\'")}')">복사</button>
+                                </div>
+                                <p style="white-space: pre-wrap;">${cap.content}</p>
+                            </div>
+                        `).join('')}
+
+                        <div style="margin-top: 24px; background: white; padding: 16px; border-radius: 8px; border-left: 3px solid #d7ccc8;">
+                            <h4 style="color: #5c4033; margin-bottom: 12px;">해시태그</h4>
+                            <div style="word-break: break-all; color: #2196f3; line-height: 1.8;">
+                                ${result.hashtags.join(' ')}
+                            </div>
+                            <button class="copy-btn" style="margin-top: 12px;" onclick="copyToClipboard('${result.hashtags.join(' ')}')">해시태그 복사</button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-warning">⚠️ 오류: ${error.message}</div>`;
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✓ 복사되었습니다!');
+            });
+        }
+
+        // Initialize
+        renderTravelList();
+    </script>
+</body>
+</html>
